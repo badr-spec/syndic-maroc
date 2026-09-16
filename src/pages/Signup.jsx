@@ -1,24 +1,18 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabaseClient'
-
-const ROLES = [
-  { value: 'resident', label: 'Résident', desc: "J'habite dans une résidence gérée par un syndic" },
-  { value: 'syndic', label: 'Responsable syndic', desc: 'Je gère une ou plusieurs résidences' },
-  { value: 'societe', label: 'Société externe', desc: 'Je gère la résidence pour le compte du syndic' }
-]
+import { useLanguage } from '../context/LanguageContext'
 
 export default function Signup() {
+  const { t } = useLanguage()
   const [step, setStep] = useState(1)
   const [role, setRole] = useState('')
   const [fullName, setFullName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [phone, setPhone] = useState('')
-  // resident / societe: rejoindre via code
   const [inviteCode, setInviteCode] = useState('')
   const [apartmentNumber, setApartmentNumber] = useState('')
-  // syndic: creer une residence
   const [residenceName, setResidenceName] = useState('')
   const [residenceAddress, setResidenceAddress] = useState('')
 
@@ -26,25 +20,26 @@ export default function Signup() {
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
 
+  const ROLES = [
+    { value: 'resident', ...t('signup.roles.resident') },
+    { value: 'syndic', ...t('signup.roles.syndic') },
+    { value: 'societe', ...t('signup.roles.societe') }
+  ]
+
   async function handleSubmit(e) {
     e.preventDefault()
     setError('')
     setLoading(true)
 
     try {
-      // 1. Creer l'utilisateur dans auth
-      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-        email,
-        password
-      })
+      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({ email, password })
       if (signUpError) throw signUpError
       const userId = signUpData.user?.id
-      if (!userId) throw new Error('Ma tsawbch l\'compte, 3awd jarreb.')
+      if (!userId) throw new Error(t('signup.errorAccount'))
 
       let residenceId = null
 
       if (role === 'syndic') {
-        // 2a. Syndic: creer une nouvelle residence, howa li houwa l'proprietaire
         const { data: residence, error: resError } = await supabase
           .from('residences')
           .insert({ name: residenceName, address: residenceAddress, syndic_id: userId })
@@ -53,17 +48,15 @@ export default function Signup() {
         if (resError) throw resError
         residenceId = residence.id
       } else {
-        // 2b. Resident / societe: khass ykono 3ndhom invite code sahih
         const { data: residence, error: findError } = await supabase
           .from('residences')
           .select('id')
           .eq('invite_code', inviteCode.trim())
           .single()
-        if (findError || !residence) throw new Error("Code d'invitation ghalat. Sowlo l'responsable syndic dyalk 3la code sahih.")
+        if (findError || !residence) throw new Error(t('signup.errorCode'))
         residenceId = residence.id
       }
 
-      // 3. Creer l'profil
       const { error: profileError } = await supabase.from('profiles').insert({
         id: userId,
         full_name: fullName,
@@ -76,7 +69,7 @@ export default function Signup() {
 
       navigate('/')
     } catch (err) {
-      setError(err.message || 'Chi mochkil wa9e3. 3awd jarreb.')
+      setError(err.message || t('signup.errorGeneric'))
     } finally {
       setLoading(false)
     }
@@ -87,13 +80,13 @@ export default function Signup() {
       <div className="auth-card wide">
         <div className="brand">
           <div className="brand-mark">SM</div>
-          <span>Syndic Maroc</span>
+          <span>{t('brand')}</span>
         </div>
-        <h1>Créer un compte</h1>
+        <h1>{t('signup.title')}</h1>
 
         {step === 1 && (
           <>
-            <p className="muted">Chno houwa dawrk f'la résidence ?</p>
+            <p className="muted">{t('signup.roleQuestion')}</p>
             <div className="role-grid">
               {ROLES.map(r => (
                 <button
@@ -108,7 +101,7 @@ export default function Signup() {
               ))}
             </div>
             <button className="btn-primary" disabled={!role} onClick={() => setStep(2)}>
-              Suivant
+              {t('signup.next')}
             </button>
           </>
         )}
@@ -116,32 +109,32 @@ export default function Signup() {
         {step === 2 && (
           <form onSubmit={handleSubmit}>
             <label>
-              Nom complet
+              {t('signup.fullName')}
               <input required value={fullName} onChange={e => setFullName(e.target.value)} />
             </label>
             <label>
-              Email
+              {t('signup.email')}
               <input type="email" required value={email} onChange={e => setEmail(e.target.value)} />
             </label>
             <label>
-              Mot de passe
+              {t('signup.password')}
               <input type="password" required minLength={6} value={password} onChange={e => setPassword(e.target.value)} />
             </label>
             <label>
-              Téléphone
-              <input value={phone} onChange={e => setPhone(e.target.value)} placeholder="06 XX XX XX XX" />
+              {t('signup.phone')}
+              <input value={phone} onChange={e => setPhone(e.target.value)} placeholder={t('signup.phonePlaceholder')} />
             </label>
 
             {role === 'syndic' && (
               <>
                 <hr />
-                <p className="muted small">Ma3lomat dyal la résidence li ghadi tsayr</p>
+                <p className="muted small">{t('signup.residenceInfo')}</p>
                 <label>
-                  Nom de la résidence
-                  <input required value={residenceName} onChange={e => setResidenceName(e.target.value)} placeholder="Résidence Al Yasmine" />
+                  {t('signup.residenceName')}
+                  <input required value={residenceName} onChange={e => setResidenceName(e.target.value)} placeholder={t('signup.residenceNamePlaceholder')} />
                 </label>
                 <label>
-                  Adresse
+                  {t('signup.address')}
                   <input value={residenceAddress} onChange={e => setResidenceAddress(e.target.value)} />
                 </label>
               </>
@@ -151,13 +144,13 @@ export default function Signup() {
               <>
                 <hr />
                 <label>
-                  Code d'invitation de la résidence
-                  <input required value={inviteCode} onChange={e => setInviteCode(e.target.value)} placeholder="Demandez-le au syndic" />
+                  {t('signup.inviteCode')}
+                  <input required value={inviteCode} onChange={e => setInviteCode(e.target.value)} placeholder={t('signup.inviteCodePlaceholder')} />
                 </label>
                 {role === 'resident' && (
                   <label>
-                    Numéro d'appartement
-                    <input value={apartmentNumber} onChange={e => setApartmentNumber(e.target.value)} placeholder="Ex: Apt 12" />
+                    {t('signup.apartmentNumber')}
+                    <input value={apartmentNumber} onChange={e => setApartmentNumber(e.target.value)} placeholder={t('signup.apartmentPlaceholder')} />
                   </label>
                 )}
               </>
@@ -166,16 +159,16 @@ export default function Signup() {
             {error && <div className="error-box">{error}</div>}
 
             <div className="row-buttons">
-              <button type="button" className="btn-secondary" onClick={() => setStep(1)}>Retour</button>
+              <button type="button" className="btn-secondary" onClick={() => setStep(1)}>{t('signup.back')}</button>
               <button type="submit" className="btn-primary" disabled={loading}>
-                {loading ? 'Chi lhda9a...' : 'Créer le compte'}
+                {loading ? t('signup.loading') : t('signup.submit')}
               </button>
             </div>
           </form>
         )}
 
         <p className="muted small">
-          3ndk compte deja ? <Link to="/login">Se connecter</Link>
+          {t('signup.alreadyAccount')} <Link to="/login">{t('signup.loginLink')}</Link>
         </p>
       </div>
     </div>
