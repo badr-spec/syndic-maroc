@@ -3,6 +3,7 @@ import { AuthProvider, useAuth } from './context/AuthContext'
 import Layout from './components/Layout'
 import Login from './pages/Login'
 import Signup from './pages/Signup'
+import CompleteInscription from './pages/CompleteInscription'
 import ResidentDashboard from './pages/dashboards/ResidentDashboard'
 import SyndicDashboard from './pages/dashboards/SyndicDashboard'
 import SocieteDashboard from './pages/dashboards/SocieteDashboard'
@@ -36,6 +37,7 @@ export default function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/complete-inscription" element={<CompleteInscription />} />
           <Route
             path="/"
             element={
