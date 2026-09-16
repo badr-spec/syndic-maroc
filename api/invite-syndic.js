@@ -10,11 +10,22 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' })
   }
 
-  const { email, full_name, admin_id } = req.body
+  const { email, full_name, residence_name, admin_id } = req.body
+
+  const { data: residence, error: resError } = await supabaseAdmin
+    .from('residences')
+    .insert({ name: residence_name })
+    .select()
+    .single()
+
+  if (resError) {
+    return res.status(400).json({ error: resError.message })
+  }
 
   const { error: invError } = await supabaseAdmin.from('invitations').insert({
     email,
     role: 'syndic',
+    residence_id: residence.id,
     invited_by: admin_id
   })
   if (invError) {
