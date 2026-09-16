@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { useAuth } from '../context/AuthContext'
+import { useLanguage } from '../context/LanguageContext'
 
 export default function ResidentsPanel() {
   const { profile } = useAuth()
+  const { t } = useLanguage()
   const [residents, setResidents] = useState([])
   const [loading, setLoading] = useState(true)
   const [copied, setCopied] = useState(false)
@@ -53,39 +55,39 @@ export default function ResidentsPanel() {
       if (data.error) {
         setInviteStatus({ ok: false, message: data.error })
       } else {
-        setInviteStatus({ ok: true, message: 'Invitation envoyee avec succes !' })
+        setInviteStatus({ ok: true, message: t('residents.success') })
         setInviteEmail('')
         setInviteApt('')
       }
     } catch (err) {
-      setInviteStatus({ ok: false, message: 'Erreur reseau, reessayez.' })
+      setInviteStatus({ ok: false, message: t('residents.networkError') })
     }
     setSending(false)
   }
 
-  if (loading) return <p className="muted">Chi lhda9a...</p>
+  if (loading) return <p className="muted">{t('common.loading')}</p>
 
   return (
     <div className="panel">
       <div className="card invite-card">
-        <h3>Inviter un resident par email</h3>
-        <p className="muted small">Le resident recevra un email pour creer son mot de passe et acceder a son compte.</p>
+        <h3>{t('residents.inviteTitle')}</h3>
+        <p className="muted small">{t('residents.inviteSubtitle')}</p>
         <form onSubmit={inviteResident} style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '8px' }}>
           <input
             type="email"
-            placeholder="email@exemple.com"
+            placeholder={t('residents.emailPlaceholder')}
             value={inviteEmail}
             onChange={e => setInviteEmail(e.target.value)}
             required
           />
           <input
             type="text"
-            placeholder="N appartement"
+            placeholder={t('residents.apartmentPlaceholder')}
             value={inviteApt}
             onChange={e => setInviteApt(e.target.value)}
           />
           <button className="btn-secondary small" type="submit" disabled={sending}>
-            {sending ? 'Envoi en cours' : 'Envoyer invitation'}
+            {sending ? t('residents.sending') : t('residents.send')}
           </button>
         </form>
         {inviteStatus && (
@@ -96,25 +98,25 @@ export default function ResidentsPanel() {
       </div>
 
       <div className="card invite-card">
-        <h3>Code d'invitation de la residence</h3>
-        <p className="muted small">Partagez ce code avec la societe externe pour qu'elle puisse creer son compte et rejoindre la residence.</p>
+        <h3>{t('residents.codeTitle')}</h3>
+        <p className="muted small">{t('residents.codeSubtitle')}</p>
         <div className="invite-code-box">
           <code>{profile.residences?.invite_code}</code>
-          <button className="btn-secondary small" onClick={copyCode}>{copied ? 'Copie !' : 'Copier'}</button>
+          <button className="btn-secondary small" onClick={copyCode}>{copied ? t('residents.copied') : t('residents.copy')}</button>
         </div>
       </div>
 
       <div className="card">
-        <h3>Membres ({residents.length})</h3>
+        <h3>{t('residents.membersTitle')} ({residents.length})</h3>
         <table className="mini-table">
           <thead>
-            <tr><th>Nom</th><th>Role</th><th>Appartement</th><th>Telephone</th></tr>
+            <tr><th>{t('residents.tableName')}</th><th>{t('residents.tableRole')}</th><th>{t('residents.tableApartment')}</th><th>{t('residents.tablePhone')}</th></tr>
           </thead>
           <tbody>
             {residents.map(r => (
               <tr key={r.id}>
                 <td>{r.full_name}</td>
-                <td>{r.role === 'resident' ? 'Resident' : r.role === 'syndic' ? 'Syndic' : 'Societe externe'}</td>
+                <td>{t('roles.' + r.role)}</td>
                 <td>{r.apartment_number || '—'}</td>
                 <td>{r.phone || '—'}</td>
               </tr>
