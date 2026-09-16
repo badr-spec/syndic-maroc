@@ -1,16 +1,22 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { useAuth } from '../context/AuthContext'
-
-const STATUS_LABEL = { pending: 'En attente', paid: 'Payé', late: 'En retard' }
+import { useLanguage } from '../context/LanguageContext'
 
 export default function ChargesPanel({ canManage }) {
   const { profile, user } = useAuth()
+  const { t } = useLanguage()
   const [charges, setCharges] = useState([])
   const [residents, setResidents] = useState([])
   const [loading, setLoading] = useState(true)
   const [form, setForm] = useState({ title: '', amount: '', due_date: '', description: '' })
   const [creating, setCreating] = useState(false)
+
+  const STATUS_LABEL = {
+    pending: t('charges.status.pending'),
+    paid: t('charges.status.paid'),
+    late: t('charges.status.late')
+  }
 
   async function loadData() {
     setLoading(true)
@@ -55,7 +61,6 @@ export default function ChargesPanel({ canManage }) {
         .single()
       if (error) throw error
 
-      // Creer automatiquement une ligne "payment" pending pour chaque resident
       if (residents.length > 0) {
         const rows = residents.map(r => ({
           charge_id: charge.id,
@@ -80,24 +85,24 @@ export default function ChargesPanel({ canManage }) {
     loadData()
   }
 
-  if (loading) return <p className="muted">Chi lhda9a...</p>
+  if (loading) return <p className="muted">{t('common.loading')}</p>
 
   return (
     <div className="panel">
       {canManage && (
         <div className="card">
-          <h3>Créer un appel de fonds</h3>
+          <h3>{t('charges.createTitle')}</h3>
           <form onSubmit={handleCreateCharge} className="inline-form">
-            <input required placeholder="Titre (ex: Charges Janvier 2027)" value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} />
-            <input required type="number" step="0.01" placeholder="Montant (DH)" value={form.amount} onChange={e => setForm({ ...form, amount: e.target.value })} />
+            <input required placeholder={t('charges.titlePlaceholder')} value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} />
+            <input required type="number" step="0.01" placeholder={t('charges.amountPlaceholder')} value={form.amount} onChange={e => setForm({ ...form, amount: e.target.value })} />
             <input required type="date" value={form.due_date} onChange={e => setForm({ ...form, due_date: e.target.value })} />
-            <input placeholder="Description (optionnel)" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} />
-            <button className="btn-primary" disabled={creating}>{creating ? 'Chi lhda9a...' : 'Créer'}</button>
+            <input placeholder={t('charges.descriptionPlaceholder')} value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} />
+            <button className="btn-primary" disabled={creating}>{creating ? t('charges.creating') : t('charges.create')}</button>
           </form>
         </div>
       )}
 
-      {charges.length === 0 && <p className="muted">Ma kayn ta charge daba.</p>}
+      {charges.length === 0 && <p className="muted">{t('charges.none')}</p>}
 
       {charges.map(charge => {
         const myPayment = charge.payments?.find(p => p.resident_id === user.id)
@@ -106,7 +111,7 @@ export default function ChargesPanel({ canManage }) {
             <div className="charge-head">
               <div>
                 <h4>{charge.title}</h4>
-                <span className="muted small">Échéance : {new Date(charge.due_date).toLocaleDateString('fr-FR')} · {charge.amount} DH</span>
+                <span className="muted small">{t('charges.dueDate')} {new Date(charge.due_date).toLocaleDateString('fr-FR')} · {charge.amount} DH</span>
               </div>
               {!canManage && myPayment && (
                 <span className={'status-pill ' + myPayment.status}>{STATUS_LABEL[myPayment.status]}</span>
@@ -115,13 +120,13 @@ export default function ChargesPanel({ canManage }) {
             {charge.description && <p className="muted small">{charge.description}</p>}
 
             {!canManage && myPayment && myPayment.status !== 'paid' && (
-              <button className="btn-primary small" onClick={() => markPaid(myPayment.id)}>Marquer comme payé</button>
+              <button className="btn-primary small" onClick={() => markPaid(myPayment.id)}>{t('charges.markPaid')}</button>
             )}
 
             {canManage && (
               <table className="mini-table">
                 <thead>
-                  <tr><th>Résident</th><th>Appartement</th><th>Statut</th></tr>
+                  <tr><th>{t('charges.tableResident')}</th><th>{t('charges.tableApartment')}</th><th>{t('charges.tableStatus')}</th></tr>
                 </thead>
                 <tbody>
                   {charge.payments?.map(p => (
