@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabaseClient'
+import { useLanguage } from '../context/LanguageContext'
 
 export default function Login() {
+  const { t } = useLanguage()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -16,7 +18,7 @@ export default function Login() {
     const { error } = await supabase.auth.signInWithPassword({ email, password })
     setLoading(false)
     if (error) {
-      setError("L'email wla mot de passe ghalat. 3awd jarreb.")
+      setError(t('login.error'))
       return
     }
     navigate('/')
@@ -27,30 +29,30 @@ export default function Login() {
       <div className="auth-card">
         <div className="brand">
           <div className="brand-mark">SM</div>
-          <span>Syndic Maroc</span>
+          <span>{t('brand')}</span>
         </div>
-        <h1>Se connecter</h1>
-        <p className="muted">Dkhol l'compte dyalk bach tsayr l'gestion dyal résidence dyalk</p>
+        <h1>{t('login.title')}</h1>
+        <p className="muted">{t('login.subtitle')}</p>
 
         <form onSubmit={handleSubmit}>
           <label>
-            Email
-            <input type="email" required value={email} onChange={e => setEmail(e.target.value)} placeholder="votre@email.com" />
+            {t('login.email')}
+            <input type="email" required value={email} onChange={e => setEmail(e.target.value)} placeholder={t('login.emailPlaceholder')} />
           </label>
           <label>
-            Mot de passe
+            {t('login.password')}
             <input type="password" required value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" />
           </label>
 
           {error && <div className="error-box">{error}</div>}
 
           <button className="btn-primary" type="submit" disabled={loading}>
-            {loading ? 'Chi lhda9a...' : 'Se connecter'}
+            {loading ? t('login.loading') : t('login.submit')}
           </button>
         </form>
 
         <p className="muted small">
-          Mazal ma3ndkch compte ? <Link to="/signup">Créer un compte</Link>
+          {t('login.noAccount')} <Link to="/signup">{t('login.signupLink')}</Link>
         </p>
       </div>
     </div>
