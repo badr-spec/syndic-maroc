@@ -12,7 +12,7 @@ export default function ResidentsPanel() {
   const [inviteStatus, setInviteStatus] = useState(null)
   const [sending, setSending] = useState(false)
 
-  useEffect(() => {
+  useEffect(() =>{sending ? 'Envoi...' : "Envoyer l'invitation"} {
     async function load() {
       setLoading(true)
       const { data } = await supabase
