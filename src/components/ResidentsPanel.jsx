@@ -85,7 +85,7 @@ export default function ResidentsPanel() {
             onChange={e => setInviteApt(e.target.value)}
           />
           <button className="btn-secondary small" type="submit" disabled={sending}>
-            {sending ? 'Envoi...' : 'Envoyer l\'invitation'}
+            {sending ? 'Envoi...' : "Envoyer l'invitation"}
           </button>
         </form>
         {inviteStatus && (
