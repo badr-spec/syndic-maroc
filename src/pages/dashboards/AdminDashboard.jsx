@@ -5,6 +5,7 @@ export default function AdminDashboard() {
   const { profile } = useAuth()
   const [email, setEmail] = useState('')
   const [fullName, setFullName] = useState('')
+  const [residenceName, setResidenceName] = useState('')
   const [status, setStatus] = useState(null)
   const [sending, setSending] = useState(false)
 
@@ -20,6 +21,7 @@ export default function AdminDashboard() {
         body: JSON.stringify({
           email,
           full_name: fullName,
+          residence_name: residenceName,
           admin_id: profile.id
         })
       })
@@ -31,6 +33,7 @@ export default function AdminDashboard() {
         setStatus({ ok: true, message: 'Invitation envoyee au syndic avec succes !' })
         setEmail('')
         setFullName('')
+        setResidenceName('')
       }
     } catch (err) {
       setStatus({ ok: false, message: 'Erreur reseau, reessayez.' })
@@ -46,7 +49,7 @@ export default function AdminDashboard() {
         <form onSubmit={createSyndic} style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '8px' }}>
           <input
             type="text"
-            placeholder="Nom complet"
+            placeholder="Nom complet du syndic"
             value={fullName}
             onChange={e => setFullName(e.target.value)}
             required
@@ -56,6 +59,13 @@ export default function AdminDashboard() {
             placeholder="email@exemple.com"
             value={email}
             onChange={e => setEmail(e.target.value)}
+            required
+          />
+          <input
+            type="text"
+            placeholder="Nom de la residence"
+            value={residenceName}
+            onChange={e => setResidenceName(e.target.value)}
             required
           />
           <button className="btn-secondary small" type="submit" disabled={sending}>
