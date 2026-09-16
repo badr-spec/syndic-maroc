@@ -6,6 +6,7 @@ import Signup from './pages/Signup'
 import ResidentDashboard from './pages/dashboards/ResidentDashboard'
 import SyndicDashboard from './pages/dashboards/SyndicDashboard'
 import SocieteDashboard from './pages/dashboards/SocieteDashboard'
+import AdminDashboard from './pages/dashboards/AdminDashboard'
 
 function Gate({ children }) {
   const { session, loading } = useAuth()
@@ -20,6 +21,7 @@ function Dashboard() {
 
   return (
     <Layout>
+      {profile.role === 'admin' && <AdminDashboard />}
       {profile.role === 'resident' && <ResidentDashboard />}
       {profile.role === 'syndic' && <SyndicDashboard />}
       {profile.role === 'societe' && <SocieteDashboard />}
