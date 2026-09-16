@@ -7,6 +7,10 @@ export default function ResidentsPanel() {
   const [residents, setResidents] = useState([])
   const [loading, setLoading] = useState(true)
   const [copied, setCopied] = useState(false)
+  const [inviteEmail, setInviteEmail] = useState('')
+  const [inviteApt, setInviteApt] = useState('')
+  const [inviteStatus, setInviteStatus] = useState(null)
+  const [sending, setSending] = useState(false)
 
   useEffect(() => {
     async function load() {
@@ -28,37 +32,61 @@ export default function ResidentsPanel() {
     setTimeout(() => setCopied(false), 2000)
   }
 
+  async function inviteResident(e) {
+    e.preventDefault()
+    setSending(true)
+    setInviteStatus(null)
+
+    try {
+      const res = await fetch('/api/invite-resident', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: inviteEmail,
+          residence_id: profile.residence_id,
+          apartment_number: inviteApt,
+          syndic_id: profile.id
+        })
+      })
+      const data = await res.json()
+
+      if (data.error) {
+        setInviteStatus({ ok: false, message: data.error })
+      } else {
+        setInviteStatus({ ok: true, message: 'Invitation envoyée avec succès !' })
+        setInviteEmail('')
+        setInviteApt('')
+      }
+    } catch (err) {
+      setInviteStatus({ ok: false, message: 'Erreur réseau, réessayez.' })
+    }
+    setSending(false)
+  }
+
   if (loading) return <p className="muted">Chi lhda9a...</p>
 
   return (
     <div className="panel">
       <div className="card invite-card">
-        <h3>Code d'invitation de la résidence</h3>
-        <p className="muted small">Partagez ce code avec les résidents et la société externe pour qu'ils puissent créer leur compte et rejoindre la résidence.</p>
-        <div className="invite-code-box">
-          <code>{profile.residences?.invite_code}</code>
-          <button className="btn-secondary small" onClick={copyCode}>{copied ? 'Copié !' : 'Copier'}</button>
-        </div>
-      </div>
-
-      <div className="card">
-        <h3>Membres ({residents.length})</h3>
-        <table className="mini-table">
-          <thead>
-            <tr><th>Nom</th><th>Rôle</th><th>Appartement</th><th>Téléphone</th></tr>
-          </thead>
-          <tbody>
-            {residents.map(r => (
-              <tr key={r.id}>
-                <td>{r.full_name}</td>
-                <td>{r.role === 'resident' ? 'Résident' : r.role === 'syndic' ? 'Syndic' : 'Société externe'}</td>
-                <td>{r.apartment_number || '—'}</td>
-                <td>{r.phone || '—'}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  )
-}
+        <h3>Inviter un résident par email</h3>
+        <p className="muted small">Le résident recevra un email pour créer son mot de passe et accéder à son compte.</p>
+        <form onSubmit={inviteResident} style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '8px' }}>
+          <input
+            type="email"
+            placeholder="email@exemple.com"
+            value={inviteEmail}
+            onChange={e => setInviteEmail(e.target.value)}
+            required
+          />
+          <input
+            type="text"
+            placeholder="N° appartement"
+            value={inviteApt}
+            onChange={e => setInviteApt(e.target.value)}
+          />
+          <button className="btn-secondary small" type="submit" disabled={sending}>
+            {sending ? 'Envoi...' : 'Envoyer l\'invitation'}
+          </button>
+        </form>
+        {inviteStatus && (
+          <p className={inviteStatus.ok ? 'success
