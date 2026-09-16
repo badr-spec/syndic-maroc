@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { useAuth } from '../context/AuthContext'
+import { useLanguage } from '../context/LanguageContext'
 
 export default function AnnouncementsPanel({ canManage }) {
   const { profile, user } = useAuth()
+  const { t } = useLanguage()
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(true)
   const [form, setForm] = useState({ title: '', content: '' })
@@ -46,27 +48,27 @@ export default function AnnouncementsPanel({ canManage }) {
   }
 
   async function handleDelete(id) {
-    if (!confirm('Bghiti thyd had l\'annonce?')) return
+    if (!confirm(t('announcements.confirmDelete'))) return
     await supabase.from('announcements').delete().eq('id', id)
     loadData()
   }
 
-  if (loading) return <p className="muted">Chi lhda9a...</p>
+  if (loading) return <p className="muted">{t('common.loading')}</p>
 
   return (
     <div className="panel">
       {canManage && (
         <div className="card">
-          <h3>Publier une annonce</h3>
+          <h3>{t('announcements.publishTitle')}</h3>
           <form onSubmit={handleCreate} className="stacked-form">
-            <input required placeholder="Titre" value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} />
-            <textarea required rows={3} placeholder="Message pour les résidents..." value={form.content} onChange={e => setForm({ ...form, content: e.target.value })} />
-            <button className="btn-primary" disabled={creating}>{creating ? 'Chi lhda9a...' : 'Publier'}</button>
+            <input required placeholder={t('announcements.titlePlaceholder')} value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} />
+            <textarea required rows={3} placeholder={t('announcements.contentPlaceholder')} value={form.content} onChange={e => setForm({ ...form, content: e.target.value })} />
+            <button className="btn-primary" disabled={creating}>{creating ? t('announcements.publishing') : t('announcements.publish')}</button>
           </form>
         </div>
       )}
 
-      {items.length === 0 && <p className="muted">Ma kayn ta annonce daba.</p>}
+      {items.length === 0 && <p className="muted">{t('announcements.none')}</p>}
 
       {items.map(item => (
         <div key={item.id} className="card">
@@ -75,7 +77,7 @@ export default function AnnouncementsPanel({ canManage }) {
               <h4>{item.title}</h4>
               <span className="muted small">{new Date(item.created_at).toLocaleDateString('fr-FR')}</span>
             </div>
-            {canManage && <button className="btn-text" onClick={() => handleDelete(item.id)}>Supprimer</button>}
+            {canManage && <button className="btn-text" onClick={() => handleDelete(item.id)}>{t('common.delete')}</button>}
           </div>
           <p>{item.content}</p>
         </div>
