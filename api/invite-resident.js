@@ -23,4 +23,12 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: invError.message })
   }
 
-  const { error: authError } = await supabaseAdmin.auth.admin.inviteUserByEmail(e
+  const { error: authError } = await supabaseAdmin.auth.admin.inviteUserByEmail(email, {
+    redirectTo: 'https://syndic-maroc-pi.vercel.app/complete-inscription'
+  })
+  if (authError) {
+    return res.status(400).json({ error: authError.message })
+  }
+
+  return res.status(200).json({ success: true })
+}
