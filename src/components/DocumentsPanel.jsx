@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { useAuth } from '../context/AuthContext'
+import { useLanguage } from '../context/LanguageContext'
 
 export default function DocumentsPanel({ canManage }) {
   const { profile, user } = useAuth()
+  const { t } = useLanguage()
   const [docs, setDocs] = useState([])
   const [loading, setLoading] = useState(true)
   const [uploading, setUploading] = useState(false)
@@ -58,34 +60,34 @@ export default function DocumentsPanel({ canManage }) {
   }
 
   async function handleDelete(doc) {
-    if (!confirm('Bghiti thyd had l\'document?')) return
+    if (!confirm(t('documents.confirmDelete'))) return
     await supabase.storage.from('documents').remove([doc.file_path])
     await supabase.from('documents').delete().eq('id', doc.id)
     loadData()
   }
 
-  if (loading) return <p className="muted">Chi lhda9a...</p>
+  if (loading) return <p className="muted">{t('common.loading')}</p>
 
   return (
     <div className="panel">
       {canManage && (
         <div className="card">
-          <h3>Ajouter un document</h3>
+          <h3>{t('documents.addTitle')}</h3>
           <div className="inline-form">
             <select value={category} onChange={e => setCategory(e.target.value)}>
-              <option value="general">Général</option>
-              <option value="proces-verbal">Procès-verbal</option>
-              <option value="reglement">Règlement intérieur</option>
-              <option value="facture">Facture</option>
-              <option value="contrat">Contrat</option>
+              <option value="general">{t('documents.categories.general')}</option>
+              <option value="proces-verbal">{t('documents.categories.pv')}</option>
+              <option value="reglement">{t('documents.categories.reglement')}</option>
+              <option value="facture">{t('documents.categories.facture')}</option>
+              <option value="contrat">{t('documents.categories.contrat')}</option>
             </select>
             <input type="file" onChange={handleUpload} disabled={uploading} />
           </div>
-          {uploading && <p className="muted small">Chi t'upload...</p>}
+          {uploading && <p className="muted small">{t('documents.uploading')}</p>}
         </div>
       )}
 
-      {docs.length === 0 && <p className="muted">Ma kayn ta document daba.</p>}
+      {docs.length === 0 && <p className="muted">{t('documents.none')}</p>}
 
       <div className="doc-grid">
         {docs.map(doc => (
@@ -94,8 +96,8 @@ export default function DocumentsPanel({ canManage }) {
             <strong>{doc.name}</strong>
             <span className="muted small">{new Date(doc.created_at).toLocaleDateString('fr-FR')}</span>
             <div className="row-buttons">
-              <button className="btn-secondary small" onClick={() => handleDownload(doc)}>Télécharger</button>
-              {canManage && <button className="btn-text" onClick={() => handleDelete(doc)}>Supprimer</button>}
+              <button className="btn-secondary small" onClick={() => handleDownload(doc)}>{t('documents.download')}</button>
+              {canManage && <button className="btn-text" onClick={() => handleDelete(doc)}>{t('common.delete')}</button>}
             </div>
           </div>
         ))}
