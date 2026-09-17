@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabaseClient'
 import { useLanguage } from '../context/LanguageContext'
 
@@ -50,10 +50,6 @@ export default function Login() {
             {loading ? t('login.loading') : t('login.submit')}
           </button>
         </form>
-
-        <p className="muted small">
-          {t('login.noAccount')} <Link to="/signup">{t('login.signupLink')}</Link>
-        </p>
       </div>
     </div>
   )
