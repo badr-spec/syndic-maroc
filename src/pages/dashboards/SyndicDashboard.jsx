@@ -5,6 +5,8 @@ import ChargesPanel from '../../components/ChargesPanel'
 import AnnouncementsPanel from '../../components/AnnouncementsPanel'
 import DocumentsPanel from '../../components/DocumentsPanel'
 import ResidentsPanel from '../../components/ResidentsPanel'
+import ImmeublesPanel from '../../components/ImmeublesPanel'
+import SocietesPanel from '../../components/SocietesPanel'
 
 export default function SyndicDashboard() {
   const { profile } = useAuth()
@@ -15,7 +17,9 @@ export default function SyndicDashboard() {
     { key: 'charges', label: t('tabs.charges') },
     { key: 'annonces', label: t('tabs.announcements') },
     { key: 'documents', label: t('tabs.documents') },
-    { key: 'residents', label: t('tabs.residents') }
+    { key: 'residents', label: t('tabs.residents') },
+    { key: 'immeubles', label: t('tabs.immeubles') },
+    { key: 'societes', label: t('tabs.societes') }
   ]
 
   return (
@@ -37,6 +41,8 @@ export default function SyndicDashboard() {
       {tab === 'annonces' && <AnnouncementsPanel canManage={true} />}
       {tab === 'documents' && <DocumentsPanel canManage={true} />}
       {tab === 'residents' && <ResidentsPanel />}
+      {tab === 'immeubles' && <ImmeublesPanel />}
+      {tab === 'societes' && <SocietesPanel />}
     </div>
   )
 }
