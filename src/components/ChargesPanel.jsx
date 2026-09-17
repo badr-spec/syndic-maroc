@@ -11,18 +11,22 @@ export default function ChargesPanel({ canManage }) {
   const [loading, setLoading] = useState(true)
   const [form, setForm] = useState({ title: '', amount: '', due_date: '', description: '' })
   const [creating, setCreating] = useState(false)
+  const [uploadingFor, setUploadingFor] = useState(null)
+  const [confirmingId, setConfirmingId] = useState(null)
 
   const STATUS_LABEL = {
     pending: t('charges.status.pending'),
     paid: t('charges.status.paid'),
-    late: t('charges.status.late')
+    late: t('charges.status.late'),
+    pending_verification: t('charges.status.pendingVerification') || 'En vérification',
+    rejected: t('charges.status.rejected') || 'Rejeté'
   }
 
   async function loadData() {
     setLoading(true)
     const { data: chargesData } = await supabase
       .from('charges')
-      .select('*, payments(id, resident_id, status, amount, paid_at, profiles:resident_id(full_name, apartment_number))')
+      .select('*, payments(id, paid_by, status, amount, paid_at, proof_url, profiles:paid_by(full_name, apartment_number))')
       .eq('residence_id', profile.residence_id)
       .order('due_date', { ascending: false })
     setCharges(chargesData || [])
@@ -32,7 +36,7 @@ export default function ChargesPanel({ canManage }) {
         .from('profiles')
         .select('id, full_name, apartment_number')
         .eq('residence_id', profile.residence_id)
-        .eq('role', 'resident')
+        .in('role', ['resident', 'societe_externe'])
       setResidents(residentsData || [])
     }
     setLoading(false)
@@ -64,7 +68,8 @@ export default function ChargesPanel({ canManage }) {
       if (residents.length > 0) {
         const rows = residents.map(r => ({
           charge_id: charge.id,
-          resident_id: r.id,
+          paid_by: r.id,
+          residence_id: profile.residence_id,
           amount: parseFloat(form.amount),
           status: 'pending'
         }))
@@ -80,9 +85,55 @@ export default function ChargesPanel({ canManage }) {
     }
   }
 
-  async function markPaid(paymentId) {
-    await supabase.from('payments').update({ status: 'paid', paid_at: new Date().toISOString() }).eq('id', paymentId)
-    loadData()
+  async function handleUploadProof(paymentId, file) {
+    setUploadingFor(paymentId)
+    try {
+      const ext = file.name.split('.').pop()
+      const path = `${user.id}/${paymentId}.${ext}`
+
+      const { error: uploadError } = await supabase.storage
+        .from('payment-proofs')
+        .upload(path, file, { upsert: true })
+      if (uploadError) throw uploadError
+
+      const { error: updateError } = await supabase
+        .from('payments')
+        .update({ status: 'pending_verification', proof_url: path })
+        .eq('id', paymentId)
+      if (updateError) throw updateError
+
+      loadData()
+    } catch (err) {
+      alert(err.message)
+    } finally {
+      setUploadingFor(null)
+    }
+  }
+
+  async function handleConfirm(paymentId, action) {
+    setConfirmingId(paymentId)
+    try {
+      const res = await fetch('/api/confirm-payment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ payment_id: paymentId, action, syndic_id: profile.id })
+      })
+      const data = await res.json()
+      if (data.error) alert(data.error)
+      loadData()
+    } catch (err) {
+      alert(err.message)
+    } finally {
+      setConfirmingId(null)
+    }
+  }
+
+  async function viewProof(path) {
+    const { data, error } = await supabase.storage
+      .from('payment-proofs')
+      .createSignedUrl(path, 60)
+    if (data?.signedUrl) window.open(data.signedUrl, '_blank')
+    if (error) alert(error.message)
   }
 
   if (loading) return <p className="muted">{t('common.loading')}</p>
@@ -105,7 +156,7 @@ export default function ChargesPanel({ canManage }) {
       {charges.length === 0 && <p className="muted">{t('charges.none')}</p>}
 
       {charges.map(charge => {
-        const myPayment = charge.payments?.find(p => p.resident_id === user.id)
+        const myPayment = charge.payments?.find(p => p.paid_by === user.id)
         return (
           <div key={charge.id} className="card charge-card">
             <div className="charge-head">
@@ -119,14 +170,34 @@ export default function ChargesPanel({ canManage }) {
             </div>
             {charge.description && <p className="muted small">{charge.description}</p>}
 
-            {!canManage && myPayment && myPayment.status !== 'paid' && (
-              <button className="btn-primary small" onClick={() => markPaid(myPayment.id)}>{t('charges.markPaid')}</button>
+            {!canManage && myPayment && myPayment.status === 'pending' && (
+              <div style={{ marginTop: '8px' }}>
+                <label className="btn-primary small" style={{ cursor: 'pointer', display: 'inline-block' }}>
+                  {uploadingFor === myPayment.id ? t('charges.uploading') || 'Envoi...' : t('charges.uploadProof') || 'J\'ai payé - envoyer justificatif'}
+                  <input
+                    type="file"
+                    accept="image/*,application/pdf"
+                    style={{ display: 'none' }}
+                    onChange={e => e.target.files[0] && handleUploadProof(myPayment.id, e.target.files[0])}
+                    disabled={uploadingFor === myPayment.id}
+                  />
+                </label>
+              </div>
+            )}
+
+            {!canManage && myPayment && myPayment.status === 'pending_verification' && (
+              <p className="muted small">{t('charges.verificationPending') || 'Justificatif envoyé, en attente de vérification par le syndic.'}</p>
             )}
 
             {canManage && (
               <table className="mini-table">
                 <thead>
-                  <tr><th>{t('charges.tableResident')}</th><th>{t('charges.tableApartment')}</th><th>{t('charges.tableStatus')}</th></tr>
+                  <tr>
+                    <th>{t('charges.tableResident')}</th>
+                    <th>{t('charges.tableApartment')}</th>
+                    <th>{t('charges.tableStatus')}</th>
+                    <th></th>
+                  </tr>
                 </thead>
                 <tbody>
                   {charge.payments?.map(p => (
@@ -134,6 +205,32 @@ export default function ChargesPanel({ canManage }) {
                       <td>{p.profiles?.full_name}</td>
                       <td>{p.profiles?.apartment_number || '—'}</td>
                       <td><span className={'status-pill ' + p.status}>{STATUS_LABEL[p.status]}</span></td>
+                      <td>
+                        {p.proof_url && (
+                          <button className="btn-secondary small" onClick={() => viewProof(p.proof_url)} style={{ marginRight: '6px' }}>
+                            {t('charges.viewProof') || 'Voir'}
+                          </button>
+                        )}
+                        {p.status === 'pending_verification' && (
+                          <>
+                            <button
+                              className="btn-primary small"
+                              onClick={() => handleConfirm(p.id, 'confirm')}
+                              disabled={confirmingId === p.id}
+                              style={{ marginRight: '6px' }}
+                            >
+                              {t('charges.confirm') || 'Confirmer'}
+                            </button>
+                            <button
+                              className="btn-secondary small"
+                              onClick={() => handleConfirm(p.id, 'reject')}
+                              disabled={confirmingId === p.id}
+                            >
+                              {t('charges.reject') || 'Rejeter'}
+                            </button>
+                          </>
+                        )}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
