@@ -7,10 +7,12 @@ export default function ResidentsPanel() {
   const { profile } = useAuth()
   const { t } = useLanguage()
   const [residents, setResidents] = useState([])
+  const [immeubles, setImmeubles] = useState([])
   const [loading, setLoading] = useState(true)
   const [copied, setCopied] = useState(false)
   const [inviteEmail, setInviteEmail] = useState('')
   const [inviteApt, setInviteApt] = useState('')
+  const [inviteImmeuble, setInviteImmeuble] = useState('')
   const [inviteStatus, setInviteStatus] = useState(null)
   const [sending, setSending] = useState(false)
 
@@ -23,6 +25,13 @@ export default function ResidentsPanel() {
         .eq('residence_id', profile.residence_id)
         .order('role')
       setResidents(data || [])
+
+      const { data: immData } = await supabase
+        .from('immeubles')
+        .select('id, name')
+        .eq('residence_id', profile.residence_id)
+      setImmeubles(immData || [])
+
       setLoading(false)
     }
     if (profile?.residence_id) load()
@@ -40,14 +49,16 @@ export default function ResidentsPanel() {
     setInviteStatus(null)
 
     try {
-      const res = await fetch('/api/invite-resident', {
+      const res = await fetch('/api/invite-user', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email: inviteEmail,
+          role: 'resident',
           residence_id: profile.residence_id,
+          immeuble_id: inviteImmeuble || null,
           apartment_number: inviteApt,
-          syndic_id: profile.id
+          invited_by: profile.id
         })
       })
       const data = await res.json()
@@ -58,6 +69,7 @@ export default function ResidentsPanel() {
         setInviteStatus({ ok: true, message: t('residents.success') })
         setInviteEmail('')
         setInviteApt('')
+        setInviteImmeuble('')
       }
     } catch (err) {
       setInviteStatus({ ok: false, message: t('residents.networkError') })
@@ -80,6 +92,14 @@ export default function ResidentsPanel() {
             onChange={e => setInviteEmail(e.target.value)}
             required
           />
+          {immeubles.length > 0 && (
+            <select value={inviteImmeuble} onChange={e => setInviteImmeuble(e.target.value)}>
+              <option value="">{t('residents.noImmeuble')}</option>
+              {immeubles.map(im => (
+                <option key={im.id} value={im.id}>{im.name}</option>
+              ))}
+            </select>
+          )}
           <input
             type="text"
             placeholder={t('residents.apartmentPlaceholder')}
