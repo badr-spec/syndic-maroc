@@ -49,7 +49,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' })
   }
 
-  const { payment_id, action, syndic_id } = req.body // action: 'confirm' or 'reject'
+  const { payment_id, action, syndic_id } = req.body
 
   const { data: payment, error: fetchError } = await supabaseAdmin
     .from('payments')
