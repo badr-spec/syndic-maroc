@@ -3,7 +3,6 @@ import { AuthProvider, useAuth } from './context/AuthContext'
 import { LanguageProvider } from './context/LanguageContext'
 import Layout from './components/Layout'
 import Login from './pages/Login'
-import Signup from './pages/Signup'
 import CompleteInscription from './pages/CompleteInscription'
 import ResidentDashboard from './pages/dashboards/ResidentDashboard'
 import SyndicDashboard from './pages/dashboards/SyndicDashboard'
@@ -38,7 +37,6 @@ export default function App() {
         <AuthProvider>
           <Routes>
             <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
             <Route path="/complete-inscription" element={<CompleteInscription />} />
             <Route
               path="/"
@@ -48,6 +46,7 @@ export default function App() {
                 </Gate>
               }
             />
+            <Route path="*" element={<Navigate to="/login" replace />} />
           </Routes>
         </AuthProvider>
       </LanguageProvider>
