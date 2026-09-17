@@ -14,7 +14,9 @@ export const translations = {
       admin: 'Administrateur',
       resident: 'Résident',
       syndic: 'Responsable syndic',
-      societe: 'Société externe'
+      societe: 'Société externe',
+      societe_externe: 'Société externe',
+      responsable_immeuble: "Responsable d'immeuble"
     },
     login: {
       title: 'Se connecter',
