@@ -84,7 +84,9 @@ export const translations = {
       announcements: 'Annonces',
       documents: 'Documents',
       residents: 'Résidents',
-      myCharges: 'Mes charges'
+      myCharges: 'Mes charges',
+      immeubles: 'Immeubles',
+      societes: 'Sociétés'
     },
     syndicDashboard: {
       managementSpace: 'Espace de gestion —'
@@ -151,7 +153,24 @@ export const translations = {
       tableName: 'Nom',
       tableRole: 'Rôle',
       tableApartment: 'Appartement',
-      tablePhone: 'Téléphone'
+      tablePhone: 'Téléphone',
+      noImmeuble: 'Aucun immeuble'
+    },
+    immeubles: {
+      addTitle: 'Ajouter un immeuble',
+      namePlaceholder: 'Ex: Immeuble A',
+      create: 'Créer',
+      creating: 'Création...',
+      listTitle: 'Liste des immeubles',
+      noResponsable: 'Aucun responsable assigné',
+      responsableIs: 'Responsable :',
+      inviteResponsable: 'Inviter',
+      inviteSuccess: 'Invitation envoyée'
+    },
+    societes: {
+      inviteTitle: 'Inviter une société externe',
+      listTitle: 'Sociétés externes',
+      success: 'Invitation envoyée'
     }
   },
   ar: {
@@ -169,7 +188,9 @@ export const translations = {
       admin: 'مدير',
       resident: 'ساكن',
       syndic: 'مسؤول السنديك',
-      societe: 'شركة خارجية'
+      societe: 'شركة خارجية',
+      societe_externe: 'شركة خارجية',
+      responsable_immeuble: 'مسؤول العمارة'
     },
     login: {
       title: 'تسجيل الدخول',
@@ -237,7 +258,9 @@ export const translations = {
       announcements: 'الإعلانات',
       documents: 'الوثائق',
       residents: 'السكان',
-      myCharges: 'مصاريفي'
+      myCharges: 'مصاريفي',
+      immeubles: 'العمارات',
+      societes: 'الشركات'
     },
     syndicDashboard: {
       managementSpace: 'فضاء الإدارة —'
@@ -304,7 +327,24 @@ export const translations = {
       tableName: 'الاسم',
       tableRole: 'الدور',
       tableApartment: 'الشقة',
-      tablePhone: 'الهاتف'
+      tablePhone: 'الهاتف',
+      noImmeuble: 'بدون عمارة'
+    },
+    immeubles: {
+      addTitle: 'إضافة عمارة',
+      namePlaceholder: 'مثال: عمارة أ',
+      create: 'إنشاء',
+      creating: 'جارٍ الإنشاء...',
+      listTitle: 'لائحة العمارات',
+      noResponsable: 'لا يوجد مسؤول معين',
+      responsableIs: 'المسؤول:',
+      inviteResponsable: 'دعوة',
+      inviteSuccess: 'تم إرسال الدعوة'
+    },
+    societes: {
+      inviteTitle: 'دعوة شركة خارجية',
+      listTitle: 'الشركات الخارجية',
+      success: 'تم إرسال الدعوة'
     }
   }
 }
