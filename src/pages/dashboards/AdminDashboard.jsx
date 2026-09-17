@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import { useAuth } from '../../context/AuthContext'
+import { useLanguage } from '../../context/LanguageContext'
 
 export default function AdminDashboard() {
   const { profile } = useAuth()
+  const { t } = useLanguage()
   const [email, setEmail] = useState('')
   const [fullName, setFullName] = useState('')
   const [residenceName, setResidenceName] = useState('')
@@ -30,13 +32,13 @@ export default function AdminDashboard() {
       if (data.error) {
         setStatus({ ok: false, message: data.error })
       } else {
-        setStatus({ ok: true, message: 'Invitation envoyee au syndic avec succes !' })
+        setStatus({ ok: true, message: t('admin.success') })
         setEmail('')
         setFullName('')
         setResidenceName('')
       }
     } catch (err) {
-      setStatus({ ok: false, message: 'Erreur reseau, reessayez.' })
+      setStatus({ ok: false, message: t('admin.networkError') })
     }
     setSending(false)
   }
@@ -44,32 +46,32 @@ export default function AdminDashboard() {
   return (
     <div className="panel">
       <div className="card invite-card">
-        <h3>Creer un syndic</h3>
-        <p className="muted small">Le syndic recevra un email pour creer son mot de passe et acceder a son compte.</p>
+        <h3>{t('admin.createSyndic')}</h3>
+        <p className="muted small">{t('admin.subtitle')}</p>
         <form onSubmit={createSyndic} style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '8px' }}>
           <input
             type="text"
-            placeholder="Nom complet du syndic"
+            placeholder={t('admin.fullNamePlaceholder')}
             value={fullName}
             onChange={e => setFullName(e.target.value)}
             required
           />
           <input
             type="email"
-            placeholder="email@exemple.com"
+            placeholder={t('admin.emailPlaceholder')}
             value={email}
             onChange={e => setEmail(e.target.value)}
             required
           />
           <input
             type="text"
-            placeholder="Nom de la residence"
+            placeholder={t('admin.residenceNamePlaceholder')}
             value={residenceName}
             onChange={e => setResidenceName(e.target.value)}
             required
           />
           <button className="btn-secondary small" type="submit" disabled={sending}>
-            {sending ? 'Envoi en cours' : 'Creer le syndic'}
+            {sending ? t('admin.sending') : t('admin.submit')}
           </button>
         </form>
         {status && (
