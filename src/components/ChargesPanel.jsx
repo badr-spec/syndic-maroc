@@ -18,8 +18,8 @@ export default function ChargesPanel({ canManage }) {
     pending: t('charges.status.pending'),
     paid: t('charges.status.paid'),
     late: t('charges.status.late'),
-    pending_verification: t('charges.status.pendingVerification') || 'En vérification',
-    rejected: t('charges.status.rejected') || 'Rejeté'
+    pending_verification: t('charges.status.pendingVerification'),
+    rejected: t('charges.status.rejected')
   }
 
   async function loadData() {
@@ -173,7 +173,7 @@ export default function ChargesPanel({ canManage }) {
             {!canManage && myPayment && myPayment.status === 'pending' && (
               <div style={{ marginTop: '8px' }}>
                 <label className="btn-primary small" style={{ cursor: 'pointer', display: 'inline-block' }}>
-                  {uploadingFor === myPayment.id ? t('charges.uploading') || 'Envoi...' : t('charges.uploadProof') || 'J\'ai payé - envoyer justificatif'}
+                  {uploadingFor === myPayment.id ? t('charges.uploading') : t('charges.uploadProof')}
                   <input
                     type="file"
                     accept="image/*,application/pdf"
@@ -186,7 +186,7 @@ export default function ChargesPanel({ canManage }) {
             )}
 
             {!canManage && myPayment && myPayment.status === 'pending_verification' && (
-              <p className="muted small">{t('charges.verificationPending') || 'Justificatif envoyé, en attente de vérification par le syndic.'}</p>
+              <p className="muted small">{t('charges.verificationPending')}</p>
             )}
 
             {canManage && (
@@ -208,7 +208,7 @@ export default function ChargesPanel({ canManage }) {
                       <td>
                         {p.proof_url && (
                           <button className="btn-secondary small" onClick={() => viewProof(p.proof_url)} style={{ marginRight: '6px' }}>
-                            {t('charges.viewProof') || 'Voir'}
+                            {t('charges.viewProof')}
                           </button>
                         )}
                         {p.status === 'pending_verification' && (
@@ -219,14 +219,14 @@ export default function ChargesPanel({ canManage }) {
                               disabled={confirmingId === p.id}
                               style={{ marginRight: '6px' }}
                             >
-                              {t('charges.confirm') || 'Confirmer'}
+                              {t('charges.confirm')}
                             </button>
                             <button
                               className="btn-secondary small"
                               onClick={() => handleConfirm(p.id, 'reject')}
                               disabled={confirmingId === p.id}
                             >
-                              {t('charges.reject') || 'Rejeter'}
+                              {t('charges.reject')}
                             </button>
                           </>
                         )}
