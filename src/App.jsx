@@ -26,7 +26,7 @@ function Dashboard() {
       {profile.role === 'admin' && <AdminDashboard />}
       {profile.role === 'resident' && <ResidentDashboard />}
       {profile.role === 'syndic' && <SyndicDashboard />}
-      {profile.role === 'societe' && <SocieteDashboard />}
+      {(profile.role === 'societe' || profile.role === 'societe_externe' || profile.role === 'responsable_immeuble') && <SocieteDashboard />}
     </Layout>
   )
 }
