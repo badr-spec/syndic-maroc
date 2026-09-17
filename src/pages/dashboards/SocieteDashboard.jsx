@@ -11,6 +11,8 @@ export default function SocieteDashboard() {
   const { t } = useLanguage()
   const [tab, setTab] = useState('charges')
 
+  const isResponsableImmeuble = profile.role === 'responsable_immeuble'
+
   const TABS = [
     { key: 'charges', label: t('tabs.charges') },
     { key: 'annonces', label: t('tabs.announcements') },
@@ -22,7 +24,11 @@ export default function SocieteDashboard() {
     <div>
       <div className="page-head">
         <h1>{profile.residences?.name}</h1>
-        <p className="muted">{t('societeDashboard.delegatedManagement')} {profile.full_name}</p>
+        <p className="muted">
+          {isResponsableImmeuble
+            ? t('societeDashboard.immeubleManagement')
+            : t('societeDashboard.delegatedManagement')} {profile.full_name}
+        </p>
       </div>
 
       <div className="tabs">
@@ -33,10 +39,10 @@ export default function SocieteDashboard() {
         ))}
       </div>
 
-      {tab === 'charges' && <ChargesPanel canManage={true} />}
-      {tab === 'annonces' && <AnnouncementsPanel canManage={true} />}
-      {tab === 'documents' && <DocumentsPanel canManage={true} />}
-      {tab === 'residents' && <ResidentsPanel />}
+      {tab === 'charges' && <ChargesPanel canManage={!isResponsableImmeuble} />}
+      {tab === 'annonces' && <AnnouncementsPanel canManage={!isResponsableImmeuble} />}
+      {tab === 'documents' && <DocumentsPanel canManage={!isResponsableImmeuble} />}
+      {tab === 'residents' && <ResidentsPanel filterImmeubleId={isResponsableImmeuble ? profile.immeuble_id : null} />}
     </div>
   )
 }
