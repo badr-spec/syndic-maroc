@@ -39,9 +39,9 @@ export default function SocieteDashboard() {
         ))}
       </div>
 
-      {tab === 'charges' && <ChargesPanel canManage={!isResponsableImmeuble} />}
-      {tab === 'annonces' && <AnnouncementsPanel canManage={!isResponsableImmeuble} />}
-      {tab === 'documents' && <DocumentsPanel canManage={!isResponsableImmeuble} />}
+      {tab === 'charges' && <ChargesPanel canManage={false} />}
+      {tab === 'annonces' && <AnnouncementsPanel canManage={false} />}
+      {tab === 'documents' && <DocumentsPanel canManage={false} />}
       {tab === 'residents' && <ResidentsPanel filterImmeubleId={isResponsableImmeuble ? profile.immeuble_id : null} />}
     </div>
   )
