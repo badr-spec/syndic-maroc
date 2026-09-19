@@ -22,6 +22,9 @@ export default function Layout({ children }) {
                 <span className="user-name">{profile.full_name}</span>
                 <span className="role-badge">{t('roles.' + profile.role)}</span>
               </div>
+              <button className="btn-secondary small" onClick={signOut}>
+                {t('common.switchAccount') || 'Se connecter (autre compte)'}
+              </button>
               <button className="btn-secondary small" onClick={signOut}>{t('common.logout')}</button>
             </>
           )}
