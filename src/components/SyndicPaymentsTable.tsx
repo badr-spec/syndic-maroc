@@ -1,40 +1,22 @@
-"use client";
-
 import { useState } from "react";
 
-type Payment = {
-  id: string;
-  transaction_id: string | null;
-  amount: number;
-  status: "pending" | "declared" | "paid" | "rejected";
-  resident_nom: string;
-  apartment_number: string;
-  paid_at?: string | null;
-};
-
-const statusLabel: Record<Payment["status"], string> = {
+const statusLabel = {
   pending: "Non payé",
   declared: "Déclaré par le résident",
   paid: "Payé",
   rejected: "Rejeté",
 };
 
-export default function SyndicPaymentsTable({
-  payments,
-  onRefresh,
-}: {
-  payments: Payment[];
-  onRefresh: () => void;
-}) {
-  const [loadingId, setLoadingId] = useState<string | null>(null);
+export default function SyndicPaymentsTable({ payments, syndicId, onRefresh }) {
+  const [loadingId, setLoadingId] = useState(null);
 
-  async function handleConfirm(id: string, action: "confirmer" | "rejeter") {
-    setLoadingId(id);
+  async function handleAction(paymentId, action) {
+    setLoadingId(paymentId);
     try {
-      const res = await fetch("/api/payments/confirm", {
+      const res = await fetch("/api/confirm-payment", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ payment_id: id, action }),
+        body: JSON.stringify({ payment_id: paymentId, action, syndic_id: syndicId }),
       });
       if (!res.ok) throw new Error((await res.json()).error);
       onRefresh();
@@ -61,31 +43,21 @@ export default function SyndicPaymentsTable({
             <td className="mono">{p.transaction_id ?? "—"}</td>
             <td>{p.amount} DH</td>
             <td>
-              <span className={`badge badge-${p.status}`}>
-                {statusLabel[p.status]}
-              </span>
+              <span className={`badge badge-${p.status}`}>{statusLabel[p.status]}</span>
             </td>
             <td>
               {p.status === "declared" && (
                 <div className="row">
-                  <button
-                    disabled={loadingId === p.id}
-                    onClick={() => handleConfirm(p.id, "confirmer")}
-                  >
+                  <button disabled={loadingId === p.id} onClick={() => handleAction(p.id, "confirm")}>
                     Confirmer
                   </button>
-                  <button
-                    disabled={loadingId === p.id}
-                    onClick={() => handleConfirm(p.id, "rejeter")}
-                  >
+                  <button disabled={loadingId === p.id} onClick={() => handleAction(p.id, "reject")}>
                     Rejeter
                   </button>
                 </div>
               )}
               {p.status === "paid" && p.paid_at && (
-                <span className="muted">
-                  {new Date(p.paid_at).toLocaleDateString("fr-FR")}
-                </span>
+                <span className="muted">{new Date(p.paid_at).toLocaleDateString("fr-FR")}</span>
               )}
             </td>
           </tr>
