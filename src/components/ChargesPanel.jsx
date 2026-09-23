@@ -8,11 +8,13 @@ export default function ChargesPanel({ canManage }) {
   const { t } = useLanguage()
   const [charges, setCharges] = useState([])
   const [residents, setResidents] = useState([])
+  const [residence, setResidence] = useState(null)
   const [loading, setLoading] = useState(true)
   const [form, setForm] = useState({ title: '', amount: '', due_date: '', description: '' })
   const [creating, setCreating] = useState(false)
   const [uploadingFor, setUploadingFor] = useState(null)
   const [confirmingId, setConfirmingId] = useState(null)
+  const [copiedField, setCopiedField] = useState(null)
 
   const STATUS_LABEL = {
     pending: t('charges.status.pending'),
@@ -26,10 +28,17 @@ export default function ChargesPanel({ canManage }) {
     setLoading(true)
     const { data: chargesData } = await supabase
       .from('charges')
-      .select('*, payments(id, paid_by, status, amount, paid_at, proof_url, profiles:paid_by(full_name, apartment_number))')
+      .select('*, payments(id, paid_by, status, amount, paid_at, proof_url, transaction_id, profiles:paid_by(full_name, apartment_number))')
       .eq('residence_id', profile.residence_id)
       .order('due_date', { ascending: false })
     setCharges(chargesData || [])
+
+    const { data: residenceData } = await supabase
+      .from('residences')
+      .select('rib, beneficiaire')
+      .eq('id', profile.residence_id)
+      .single()
+    setResidence(residenceData || null)
 
     if (canManage) {
       const { data: residentsData } = await supabase
@@ -98,7 +107,7 @@ export default function ChargesPanel({ canManage }) {
 
       const { error: updateError } = await supabase
         .from('payments')
-        .update({ status: 'pending_verification', proof_url: path })
+        .update({ status: 'pending_verification', proof_url: path, payment_method: 'virement' })
         .eq('id', paymentId)
       if (updateError) throw updateError
 
@@ -134,6 +143,12 @@ export default function ChargesPanel({ canManage }) {
       .createSignedUrl(path, 60)
     if (data?.signedUrl) window.open(data.signedUrl, '_blank')
     if (error) alert(error.message)
+  }
+
+  function copyToClipboard(text, field) {
+    navigator.clipboard.writeText(text)
+    setCopiedField(field)
+    setTimeout(() => setCopiedField(null), 1500)
   }
 
   if (loading) return <p className="muted">{t('common.loading')}</p>
@@ -172,6 +187,41 @@ export default function ChargesPanel({ canManage }) {
 
             {!canManage && myPayment && myPayment.status === 'pending' && (
               <div style={{ marginTop: '8px' }}>
+                {residence?.rib && (
+                  <div className="bank-transfer-info" style={{ background: '#f5f5f0', borderRadius: '8px', padding: '12px', marginBottom: '10px' }}>
+                    <p className="muted small" style={{ marginBottom: '8px' }}>
+                      {t('charges.bankTransferInstructions') || 'Payez par virement avec les coordonnées ci-dessous, puis envoyez la preuve.'}
+                    </p>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                      <span className="small">{t('charges.beneficiary') || 'Bénéficiaire'}: <strong>{residence.beneficiaire}</strong></span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                      <span className="small" style={{ fontFamily: 'monospace' }}>{residence.rib}</span>
+                      <button
+                        type="button"
+                        className="btn-secondary small"
+                        onClick={() => copyToClipboard(residence.rib, 'rib-' + charge.id)}
+                      >
+                        {copiedField === 'rib-' + charge.id ? '✓' : (t('charges.copy') || 'Copier')}
+                      </button>
+                    </div>
+                    {myPayment.transaction_id && (
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span className="small">
+                          {t('charges.reference') || 'Référence'}: <span style={{ fontFamily: 'monospace' }}>{myPayment.transaction_id}</span>
+                        </span>
+                        <button
+                          type="button"
+                          className="btn-secondary small"
+                          onClick={() => copyToClipboard(myPayment.transaction_id, 'ref-' + charge.id)}
+                        >
+                          {copiedField === 'ref-' + charge.id ? '✓' : (t('charges.copy') || 'Copier')}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 <label className="btn-primary small" style={{ cursor: 'pointer', display: 'inline-block' }}>
                   {uploadingFor === myPayment.id ? t('charges.uploading') : t('charges.uploadProof')}
                   <input
