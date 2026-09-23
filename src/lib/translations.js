@@ -86,7 +86,10 @@ export const translations = {
       delete: 'Supprimer',
       deleteConfirm: 'Supprimer ce syndic ? Cette action est irréversible.',
       loading: 'Chargement...',
-      noSyndics: 'Aucun syndic pour le moment.'
+      noSyndics: 'Aucun syndic pour le moment.',
+      status: 'Statut',
+      statusActive: 'Actif',
+      statusPending: 'En attente'
     },
     tabs: {
       charges: 'Charges & paiements',
@@ -286,7 +289,10 @@ export const translations = {
       delete: 'حذف',
       deleteConfirm: 'واش متأكد بغيتي تحذف هاد السنديك؟ ماغادي يرجع.',
       loading: 'جارٍ التحميل...',
-      noSyndics: 'لا يوجد أي سنديك حاليًا.'
+      noSyndics: 'لا يوجد أي سنديك حاليًا.',
+      status: 'الحالة',
+      statusActive: 'نشيط',
+      statusPending: 'في الانتظار'
     },
     tabs: {
       charges: 'المصاريف والمدفوعات',
