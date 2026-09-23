@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAuth } from '../../context/AuthContext'
 import { useLanguage } from '../../context/LanguageContext'
 
@@ -10,6 +10,26 @@ export default function AdminDashboard() {
   const [residenceName, setResidenceName] = useState('')
   const [status, setStatus] = useState(null)
   const [sending, setSending] = useState(false)
+
+  const [syndics, setSyndics] = useState([])
+  const [loadingList, setLoadingList] = useState(true)
+  const [deletingId, setDeletingId] = useState(null)
+
+  async function loadSyndics() {
+    setLoadingList(true)
+    try {
+      const res = await fetch('/api/list-syndics')
+      const data = await res.json()
+      setSyndics(data.syndics || [])
+    } catch (err) {
+      console.error(err)
+    }
+    setLoadingList(false)
+  }
+
+  useEffect(() => {
+    loadSyndics()
+  }, [])
 
   async function createSyndic(e) {
     e.preventDefault()
@@ -36,6 +56,7 @@ export default function AdminDashboard() {
         setEmail('')
         setFullName('')
         setResidenceName('')
+        loadSyndics() //🔄 عاود جيب اللائحة باش تبان السنديك الجديد
       }
     } catch (err) {
       setStatus({ ok: false, message: t('admin.networkError') })
@@ -43,9 +64,71 @@ export default function AdminDashboard() {
     setSending(false)
   }
 
+  async function deleteSyndic(syndicId) {
+    if (!window.confirm(t('admin.deleteConfirm'))) return
+    setDeletingId(syndicId)
+    try {
+      const res = await fetch('/api/delete-syndic', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ syndic_id: syndicId, admin_id: profile.id })
+      })
+      const data = await res.json()
+      if (data.error) {
+        alert(data.error)
+      } else {
+        setSyndics(prev => prev.filter(s => s.id !== syndicId))
+      }
+    } catch (err) {
+      alert(t('admin.networkError'))
+    }
+    setDeletingId(null)
+  }
+
   return (
     <div className="panel">
-      <div className="card invite-card">
+      {/* ===== لائحة السنانديك ===== */}
+      <div className="card">
+        <h3>{t('admin.syndicsList')}</h3>
+
+        {loadingList ? (
+          <p className="muted small">{t('admin.loading')}</p>
+        ) : syndics.length === 0 ? (
+          <p className="muted small">{t('admin.noSyndics')}</p>
+        ) : (
+          <table style={{ width: '100%', marginTop: '8px', borderCollapse: 'collapse' }}>
+            <thead>
+              <tr>
+                <th style={{ textAlign: 'left', padding: '6px' }}>{t('admin.name')}</th>
+                <th style={{ textAlign: 'left', padding: '6px' }}>{t('admin.email')}</th>
+                <th style={{ textAlign: 'left', padding: '6px' }}>{t('admin.residence')}</th>
+                <th style={{ textAlign: 'left', padding: '6px' }}></th>
+              </tr>
+            </thead>
+            <tbody>
+              {syndics.map(s => (
+                <tr key={s.id} style={{ borderTop: '1px solid #eee' }}>
+                  <td style={{ padding: '6px' }}>{s.full_name}</td>
+                  <td style={{ padding: '6px' }}>{s.email}</td>
+                  <td style={{ padding: '6px' }}>{s.residence_name || '—'}</td>
+                  <td style={{ padding: '6px' }}>
+                    <button
+                      className="btn-secondary small"
+                      onClick={() => deleteSyndic(s.id)}
+                      disabled={deletingId === s.id}
+                    >
+                      {deletingId === s.id ? '...' : t('admin.delete')}
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+
+      {/* ===== إضافة سنديك جديد ===== */}
+      <div className="card invite-card" style={{ marginTop: '16px' }}>
         <h3>{t('admin.createSyndic')}</h3>
         <p className="muted small">{t('admin.subtitle')}</p>
         <form onSubmit={createSyndic} style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '8px' }}>
