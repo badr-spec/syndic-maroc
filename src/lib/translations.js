@@ -78,7 +78,15 @@ export const translations = {
       submit: 'Créer le syndic',
       sending: 'Envoi en cours...',
       success: 'Invitation envoyée au syndic avec succès !',
-      networkError: 'Erreur réseau, réessayez.'
+      networkError: 'Erreur réseau, réessayez.',
+      syndicsList: 'Syndics',
+      name: 'Nom',
+      email: 'Email',
+      residence: 'Résidence',
+      delete: 'Supprimer',
+      deleteConfirm: 'Supprimer ce syndic ? Cette action est irréversible.',
+      loading: 'Chargement...',
+      noSyndics: 'Aucun syndic pour le moment.'
     },
     tabs: {
       charges: 'Charges & paiements',
@@ -125,7 +133,11 @@ export const translations = {
       verificationPending: 'Justificatif envoyé, en attente de vérification par le syndic.',
       viewProof: 'Voir justificatif',
       confirm: 'Confirmer',
-      reject: 'Rejeter'
+      reject: 'Rejeter',
+      bankTransferInstructions: "Merci d'effectuer le virement bancaire aux coordonnées ci-dessous",
+      beneficiary: 'Bénéficiaire',
+      reference: 'Référence',
+      copy: 'Copier'
     },
     announcements: {
       publishTitle: 'Publier une annonce',
@@ -266,7 +278,15 @@ export const translations = {
       submit: 'إنشاء السنديك',
       sending: 'جارٍ الإرسال...',
       success: 'تم إرسال الدعوة إلى السنديك بنجاح!',
-      networkError: 'خطأ في الشبكة، حاول مجددًا.'
+      networkError: 'خطأ في الشبكة، حاول مجددًا.',
+      syndicsList: 'السنانديك',
+      name: 'الاسم',
+      email: 'البريد الإلكتروني',
+      residence: 'الإقامة',
+      delete: 'حذف',
+      deleteConfirm: 'واش متأكد بغيتي تحذف هاد السنديك؟ ماغادي يرجع.',
+      loading: 'جارٍ التحميل...',
+      noSyndics: 'لا يوجد أي سنديك حاليًا.'
     },
     tabs: {
       charges: 'المصاريف والمدفوعات',
@@ -313,7 +333,11 @@ export const translations = {
       verificationPending: 'تم إرسال الإثبات، في انتظار تحقق السنديك.',
       viewProof: 'عرض الإثبات',
       confirm: 'تأكيد',
-      reject: 'رفض'
+      reject: 'رفض',
+      bankTransferInstructions: 'المرجو القيام بالتحويل البنكي على الحساب أدناه',
+      beneficiary: 'المستفيد',
+      reference: 'المرجع',
+      copy: 'نسخ'
     },
     announcements: {
       publishTitle: 'نشر إعلان',
