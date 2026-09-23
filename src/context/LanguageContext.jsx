@@ -14,11 +14,22 @@ export function LanguageProvider({ children }) {
 
   function t(path) {
     const keys = path.split('.')
+
     let value = translations[lang]
     for (const k of keys) {
       value = value?.[k]
     }
-    return value ?? path
+    if (value !== undefined) return value
+
+    // fallback: had l-key makaynach f lang lli mkhtara, njarbo bel fransia
+    let fallback = translations['fr']
+    for (const k of keys) {
+      fallback = fallback?.[k]
+    }
+    if (fallback !== undefined) return fallback
+
+    // walakin makaynach f fr, nrj3o l-path bhalha (bash tban l-key khasa t-zad)
+    return path
   }
 
   function toggleLang() {
