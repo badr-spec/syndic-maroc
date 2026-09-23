@@ -64,20 +64,27 @@ export default function AdminDashboard() {
     setSending(false)
   }
 
-  async function deleteSyndic(syndicId) {
+  // s: le syndic (ou l'invitation pending) qu'on veut supprimer
+  async function deleteSyndic(s) {
     if (!window.confirm(t('admin.deleteConfirm'))) return
-    setDeletingId(syndicId)
+    setDeletingId(s.id)
     try {
       const res = await fetch('/api/delete-syndic', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ syndic_id: syndicId, admin_id: profile.id })
+        body: JSON.stringify({
+          // 'active' 3ndo compte deja -> khasso syndic_id
+          // 'pending' mazal ma-dkhalch -> khasso invitation_id
+          syndic_id: s.status === 'pending' ? null : s.id,
+          invitation_id: s.status === 'pending' ? s.invitation_id : null,
+          admin_id: profile.id
+        })
       })
       const data = await res.json()
       if (data.error) {
         alert(data.error)
       } else {
-        setSyndics(prev => prev.filter(s => s.id !== syndicId))
+        setSyndics(prev => prev.filter(item => item.id !== s.id))
       }
     } catch (err) {
       alert(t('admin.networkError'))
@@ -102,19 +109,27 @@ export default function AdminDashboard() {
                 <th style={{ textAlign: 'left', padding: '6px' }}>{t('admin.name')}</th>
                 <th style={{ textAlign: 'left', padding: '6px' }}>{t('admin.email')}</th>
                 <th style={{ textAlign: 'left', padding: '6px' }}>{t('admin.residence')}</th>
+                <th style={{ textAlign: 'left', padding: '6px' }}>{t('admin.status')}</th>
                 <th style={{ textAlign: 'left', padding: '6px' }}></th>
               </tr>
             </thead>
             <tbody>
               {syndics.map(s => (
                 <tr key={s.id} style={{ borderTop: '1px solid #eee' }}>
-                  <td style={{ padding: '6px' }}>{s.full_name}</td>
+                  <td style={{ padding: '6px' }}>{s.full_name || '—'}</td>
                   <td style={{ padding: '6px' }}>{s.email}</td>
                   <td style={{ padding: '6px' }}>{s.residence_name || '—'}</td>
                   <td style={{ padding: '6px' }}>
+                    {s.status === 'pending' ? (
+                      <span className="badge pending">{t('admin.statusPending')}</span>
+                    ) : (
+                      <span className="badge active">{t('admin.statusActive')}</span>
+                    )}
+                  </td>
+                  <td style={{ padding: '6px' }}>
                     <button
                       className="btn-secondary small"
-                      onClick={() => deleteSyndic(s.id)}
+                      onClick={() => deleteSyndic(s)}
                       disabled={deletingId === s.id}
                     >
                       {deletingId === s.id ? '...' : t('admin.delete')}
