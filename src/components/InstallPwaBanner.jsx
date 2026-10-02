@@ -91,21 +91,94 @@ export default function InstallPwaBanner() {
     } catch (e) {}
   }
 
-  // Only render modal when triggered by the user
-  if (!showGuideModal) return null
-
+  // Render in-app helper banner or modal
   return (
-    <div style={{
-      position: 'fixed',
-      inset: 0,
-      background: 'rgba(0,0,0,0.65)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      zIndex: 3500,
-      padding: '16px',
-      backdropFilter: 'blur(3px)'
-    }}>
+    <>
+      {deviceInfo.isInApp && !isStandalone && (
+        <div style={{
+          background: 'linear-gradient(135deg, #052e1f 0%, #047857 100%)',
+          color: '#ffffff',
+          padding: '12px 16px',
+          borderBottom: '2px solid #34d399',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+        }}>
+          <div style={{
+            maxWidth: '980px',
+            margin: '0 auto',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '12px',
+            flexWrap: 'wrap'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <img src="/logo.svg" alt="Syndic Maroc" style={{ width: '38px', height: '38px', borderRadius: '8px' }} />
+              <div>
+                <strong style={{ fontSize: '0.92rem', display: 'block', color: '#ffffff' }}>
+                  {isAr ? 'تثبيت تطبيق سنديك المغرب على شاشة هاتفك' : 'Installer Syndic Maroc sur votre téléphone'}
+                </strong>
+                <span style={{ fontSize: '0.78rem', color: '#d1fae5' }}>
+                  {isAr
+                    ? 'أنت تتصفح من داخل Messenger. اضغط أدناه لفتحه في Chrome وتثبيته فوراً بالشعار الرسمي:'
+                    : 'Vous êtes dans Messenger (qui bloque l’installation directe). Cliquez pour ouvrir dans Chrome :'}
+                </span>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+              <a
+                href={'intent://' + window.location.host + window.location.pathname + window.location.search + '#Intent;scheme=https;package=com.android.chrome;end;'}
+                style={{
+                  background: '#ffffff',
+                  color: '#052e1f',
+                  padding: '8px 14px',
+                  borderRadius: '8px',
+                  fontWeight: 800,
+                  fontSize: '0.82rem',
+                  textDecoration: 'none',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  boxShadow: '0 2px 6px rgba(0,0,0,0.2)'
+                }}
+              >
+                <span>🚀</span>
+                <span>{isAr ? 'فتح في Google Chrome وتثبيت' : 'Ouvrir dans Chrome & Installer'}</span>
+              </a>
+
+              <button
+                type="button"
+                onClick={handleCopyCurrentUrl}
+                style={{
+                  background: 'rgba(255,255,255,0.15)',
+                  border: '1px solid rgba(255,255,255,0.4)',
+                  color: '#ffffff',
+                  padding: '8px 12px',
+                  borderRadius: '8px',
+                  fontWeight: 600,
+                  fontSize: '0.78rem',
+                  cursor: 'pointer'
+                }}
+              >
+                {copiedLink ? '✓ ' + (isAr ? 'تم النسخ' : 'Copié') : '📋 ' + (isAr ? 'نسخ الرابط' : 'Copier lien')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showGuideModal && (
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          background: 'rgba(0,0,0,0.65)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 3500,
+          padding: '16px',
+          backdropFilter: 'blur(3px)'
+        }}>
       <div className="card" style={{
         background: '#ffffff',
         maxWidth: '520px',
@@ -351,5 +424,7 @@ export default function InstallPwaBanner() {
         </button>
       </div>
     </div>
+    )}
+  </>
   )
 }
