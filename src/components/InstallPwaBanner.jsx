@@ -142,36 +142,43 @@ export default function InstallPwaBanner() {
           </button>
         </div>
 
-        {/* Big Direct Action Button (if supported by browser) */}
-        {deferredPrompt ? (
-          <button
-            type="button"
-            onClick={() => {
+        {/* Big Direct Action Button (Always visible) */}
+        <button
+          type="button"
+          onClick={() => {
+            if (deferredPrompt) {
               deferredPrompt.prompt()
               setShowGuideModal(false)
-            }}
-            style={{
-              width: '100%',
-              background: '#047857',
-              color: '#ffffff',
-              border: 'none',
-              padding: '13px',
-              borderRadius: '10px',
-              fontWeight: 800,
-              fontSize: '0.96rem',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '8px',
-              marginBottom: '16px',
-              boxShadow: '0 4px 12px rgba(4, 120, 87, 0.25)'
-            }}
-          >
-            <span>📲</span>
-            <span>{isAr ? 'تثبيت التطبيق على هذا الهاتف فوراً' : 'Installer sur ce téléphone immédiatement'}</span>
-          </button>
-        ) : null}
+            } else {
+              // Highlight the steps below
+              setSelectedDeviceTab('phone')
+            }
+          }}
+          style={{
+            width: '100%',
+            background: '#047857',
+            color: '#ffffff',
+            border: 'none',
+            padding: '13px',
+            borderRadius: '10px',
+            fontWeight: 800,
+            fontSize: '0.96rem',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '8px',
+            marginBottom: '16px',
+            boxShadow: '0 4px 12px rgba(4, 120, 87, 0.25)'
+          }}
+        >
+          <span>📲</span>
+          <span>
+            {deferredPrompt
+              ? (isAr ? 'تثبيت التطبيق على هذا الهاتف فوراً (نقرة واحدة)' : 'Installer sur ce téléphone immédiatement (1 clic)')
+              : (isAr ? 'طريقة تثبيت التطبيق والشعار على الهاتف' : 'Guide d’installation sur votre téléphone')}
+          </span>
+        </button>
 
         {/* If opened inside WhatsApp / Instagram browser */}
         {deviceInfo.isInApp && (
