@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#052e1f"/>
+      <stop offset="50%" stop-color="#093d2b"/>
+      <stop offset="100%" stop-color="#042216"/>
+    </linearGradient>
+
+    <!-- Subtle Inner Glow -->
+    <radialGradient id="haloGrad" cx="50%" cy="40%" r="50%">
+      <stop offset="0%" stop-color="#10b981" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#052e1f" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Squircle Base Container -->
+  <rect width="512" height="512" rx="112" fill="url(#bgGrad)"/>
+  <rect width="512" height="512" rx="112" fill="url(#haloGrad)"/>
+
+  <!-- Delicate Arch Arc -->
+  <path d="M 100 336 A 185 185 0 1 1 412 336" fill="none" stroke="#4ade80" stroke-width="4.5" stroke-opacity="0.55" stroke-linecap="round"/>
+
+  <!-- Group for Building & Palm -->
+  <g transform="translate(0, -10)">
+    <!-- 3D Modern Residence Building -->
+    <!-- Left Angled Facade with Balconies -->
+    <!-- Main Left Wall (Shadowed) -->
+    <polygon points="185,165 262,112 262,328 148,332 148,220" fill="#042618" opacity="0.6"/>
+
+    <!-- Balcony 1 (Top) -->
+    <polygon points="182,185 248,150 248,168 182,203" fill="#042618"/>
+    <polygon points="148,222 250,150 250,165 148,237" fill="#ffffff"/>
+    
+    <!-- Balcony 2 (Middle) -->
+    <polygon points="152,260 250,205 250,222 152,277" fill="#ffffff"/>
+    <polygon points="182,242 248,207 248,222 182,257" fill="#042618"/>
+
+    <!-- Balcony 3 (Bottom) -->
+    <polygon points="148,300 250,260 250,277 148,317" fill="#ffffff"/>
+    <polygon points="182,298 248,263 248,277 182,312" fill="#042618"/>
+
+    <!-- Left Facade Column Support -->
+    <polygon points="148,175 154,172 154,332 148,332" fill="#ffffff"/>
+
+    <!-- Right Sunlight Wall (Main White Tower) -->
+    <polygon points="262,112 358,168 358,345 262,332" fill="#ffffff"/>
+
+    <!-- 3 Windows on Right Facade -->
+    <rect x="286" y="172" width="20" height="34" rx="2" fill="#063e2a"/>
+    <rect x="286" y="218" width="20" height="34" rx="2" fill="#063e2a"/>
+    <rect x="286" y="264" width="20" height="34" rx="2" fill="#063e2a"/>
+
+    <!-- Stylized Palm Tree -->
+    <!-- Trunk -->
+    <path d="M 344 345 Q 346 310 348 290 Q 345 310 342 345 Z" fill="#ffffff"/>
+    <!-- Fronds -->
+    <path d="M 346 290 Q 320 286 312 298 Q 328 292 346 290" fill="#ffffff"/>
+    <path d="M 346 290 Q 318 274 316 262 Q 330 274 346 290" fill="#ffffff"/>
+    <path d="M 346 290 Q 338 250 344 242 Q 348 260 346 290" fill="#ffffff"/>
+    <path d="M 346 290 Q 364 254 372 260 Q 364 274 346 290" fill="#ffffff"/>
+    <path d="M 346 290 Q 380 278 384 290 Q 366 292 346 290" fill="#ffffff"/>
+    <path d="M 346 290 Q 374 304 378 316 Q 362 308 346 290" fill="#ffffff"/>
+    <path d="M 346 290 Q 322 306 316 318 Q 330 306 346 290" fill="#ffffff"/>
+
+    <!-- Swooping Horizon Curved Ground Line -->
+    <path d="M 98 358 Q 256 318 414 358 L 412 363 Q 256 323 100 363 Z" fill="#ffffff"/>
+  </g>
+
+  <!-- Typography -->
+  <!-- SYNDIC -->
+  <text x="256" y="398" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, sans-serif" font-size="34" font-weight="800" fill="#ffffff" letter-spacing="9">SYNDIC</text>
+
+  <!-- — MAROC — -->
+  <g transform="translate(256, 424)">
+    <line x1="-105" y1="-5" x2="-65" y2="-5" stroke="#34d399" stroke-width="2.5" stroke-linecap="round"/>
+    <text x="0" y="0" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="700" fill="#34d399" letter-spacing="7">MAROC</text>
+    <line x1="65" y1="-5" x2="105" y2="-5" stroke="#34d399" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
+</svg>

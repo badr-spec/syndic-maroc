@@ -1,0 +1,5 @@
+{
+  "name": "Syndic Maroc — Gestion de résidence",
+  "description": "Gestion intelligente et transparente de votre résidence",
+  "capabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
