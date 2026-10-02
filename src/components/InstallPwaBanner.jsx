@@ -34,7 +34,7 @@ export default function InstallPwaBanner() {
     const iosDevice = /iphone|ipad|ipod/.test(ua)
     const androidDevice = /android/.test(ua)
     const pcDevice = !iosDevice && !androidDevice && !/mobile|tablet/i.test(ua)
-    const inApp = /fban|fbav|instagram|whatsapp|line|micromessenger|snapchat|threads/i.test(ua)
+    const inApp = /messenger|fban|fbav|fb_iab|fbios|instagram|whatsapp|line|micromessenger|snapchat|threads/i.test(ua)
 
     setDeviceInfo({
       isIos: iosDevice,
@@ -180,7 +180,7 @@ export default function InstallPwaBanner() {
           </span>
         </button>
 
-        {/* If opened inside WhatsApp / Instagram browser */}
+        {/* If opened inside Messenger / WhatsApp / Instagram browser */}
         {deviceInfo.isInApp && (
           <div style={{
             background: '#fffbeb',
@@ -191,11 +191,11 @@ export default function InstallPwaBanner() {
             fontSize: '0.84rem',
             color: '#92400e'
           }}>
-            <strong>⚠️ {isAr ? 'أنت تتصفح من داخل الواتساب' : 'Lien ouvert dans WhatsApp'}</strong>
+            <strong>⚠️ {isAr ? 'أنت تتصفح من داخل تطبيق Messenger أو WhatsApp' : 'Lien ouvert dans Messenger ou WhatsApp'}</strong>
             <p style={{ margin: '4px 0 8px 0', lineHeight: 1.4 }}>
               {isAr
-                ? 'متصفح الواتساب يمنع التثبيت المباشر. اضغط على النقاط الثلاث (⋮) في الأعلى ثم اختر «فتح في المتصفح Chrome أو Safari».'
-                : 'Le navigateur WhatsApp bloque l’installation directe. Cliquez sur les 3 points (⋮) en haut puis choisissez « Ouvrir dans Chrome ou Safari ».'}
+                ? 'متصفح Messenger الداخلي يمنع تثبيت التطبيقات. اضغط على النقاط الثلاث (⋯) في الأعلى ثم اختر «فتح في المتصفح» (Ouvrir dans le navigateur).'
+                : 'Le navigateur interne de Messenger bloque l’installation directe d’applications. Touchez les 3 points (⋯) en haut puis sélectionnez « Ouvrir dans le navigateur ».'}
             </p>
             <button
               type="button"
@@ -204,14 +204,14 @@ export default function InstallPwaBanner() {
                 background: '#ffffff',
                 border: '1px solid #d97706',
                 color: '#92400e',
-                padding: '6px 12px',
+                padding: '7px 12px',
                 borderRadius: '6px',
-                fontSize: '0.78rem',
+                fontSize: '0.8rem',
                 fontWeight: 700,
                 cursor: 'pointer'
               }}
             >
-              {copiedLink ? '✓ ' + (isAr ? 'تم نسخ الرابط' : 'Lien copié !') : '📋 ' + (isAr ? 'نسخ رابط التطبيق لفتحه في Chrome' : 'Copier le lien pour Chrome / Safari')}
+              {copiedLink ? '✓ ' + (isAr ? 'تم نسخ الرابط' : 'Lien copié !') : '📋 ' + (isAr ? 'نسخ الرابط لفتحه في Google Chrome' : 'Copier le lien pour l’ouvrir dans Chrome')}
             </button>
           </div>
         )}
